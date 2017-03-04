@@ -1,0 +1,37 @@
+<html>
+	<head>
+		<title>test</title>
+	</head>
+	<script>
+		function display(id)
+		{
+			var NewStringValue = document.getElementById(id).value;
+			document.getElementById("chat_line").innerHTML = NewStringValue;
+		}
+		function showMsg(msg_content)
+		{
+			var entry = document.createElement('li');
+			entry.appendChild(document.createTextNode(msg_content));
+			var msg_list = document.getElementById("msg_list");
+			msg_list.appendChild(entry);
+		}
+		function sendMsg()
+		{
+			var msg_content = document.getElementById("msg_input").value;
+			showMsg(msg_content);
+			document.getElementById("msg_input").value = "";
+		}
+		function enter_pressed(event)
+		{
+			if (event.keyCode == 13) { sendMsg() }
+		}
+	</script>
+	<body>
+		<h4 id='chat_line'>Idiot Chat Room by DongTsu</h4>
+		<div id="msg_block">
+			<ul id="msg_list"></ul>
+		<div>
+		<input id="msg_input" autocomplete="off" onkeypress="enter_pressed(event)" /><button id="send" onclick="sendMsg()">Send</button>
+		
+	</body>
+</html>
