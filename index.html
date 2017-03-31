@@ -1,37 +1,301 @@
+<!doctype html>
+<meta charset="utf-8">
 <html>
 	<head>
-		<title>test</title>
+		<title> Idiot Chat Room </title>
+			<style>
+				* {
+					margin: 0;
+					padding: 0;
+					box-sizing: border-box;
+				}
+				body {
+					font: 12px Helvetica, Arial;
+					background-color: #F5F5F5;
+				}
+				h3 {
+					font: 16px Georgia, Times New Roman;
+					font-weight: bold;
+					color: #FFFFFF;
+					background: #263238;
+					padding: 5px;
+				}
+				form {
+					background: #000;
+					bottom: 0;
+					padding: 3px;
+					position: fixed;
+					width: 100%;
+				}
+				form input {
+					border: 0;
+					border-radius: 2px;
+					padding: 10px;
+					margin: .3% .5% .3% .5%;
+					width: 90%;
+				}
+				form button {
+					background-color: #3498db;
+					border: none;
+					border-radius: 2px;
+					color: white;
+					padding: 10px;
+					width: 8.5%;
+				}
+				.user-or-time-change {
+					background: #CFD8DC;
+					color: #455A64;
+					text-align: center;
+				}
+				#msg-div {
+					background-color: #F5F5F5;
+					border-radius: 5px;
+					float: left;
+					height: 80vh;
+					overflow: auto;
+					overflow-x: hidden;
+					width: 70%;
+				}				
+				#msg-div div {
+					padding: 5px 10px;
+					border-radius: 2px;
+				}
+				#msg-div ul li {
+					color: #000000;					
+					list-style-type: none;
+					padding-left: 10px;
+				}
+				#user-list-div {
+					background-color: #FFEBEE;
+					border-radius: 5px;
+					float: right;
+					padding: 5px;
+					width: 30%;
+				}
+				.msg-div-mine { background: #B3E5FC;	}
+				.msg-div-others { background: #E1F5FE; }
+				#user-list-header { color: #455A64; }
+				#user-list-ul { margin-left: 20px; }
+				#user-list-ul li {	color: #607D8B; }
+		</style>
 	</head>
-	<script>
-		function display(id)
-		{
-			var NewStringValue = document.getElementById(id).value;
-			document.getElementById("chat_line").innerHTML = NewStringValue;
-		}
-		function showMsg(msg_content)
-		{
-			var entry = document.createElement('li');
-			entry.appendChild(document.createTextNode(msg_content));
-			var msg_list = document.getElementById("msg_list");
-			msg_list.appendChild(entry);
-		}
-		function sendMsg()
-		{
-			var msg_content = document.getElementById("msg_input").value;
-			showMsg(msg_content);
-			document.getElementById("msg_input").value = "";
-		}
-		function enter_pressed(event)
-		{
-			if (event.keyCode == 13) { sendMsg() }
-		}
-	</script>
 	<body>
-		<h4 id='chat_line'>Idiot Chat Room by DongTsu</h4>
-		<div id="msg_block">
-			<ul id="msg_list"></ul>
-		<div>
-		<input id="msg_input" autocomplete="off" onkeypress="enter_pressed(event)" /><button id="send" onclick="sendMsg()">Send</button>
-		
+		<h3 id="chatroom-header">Idiot Chat Room by DongTsu and ATeng</h3>
+		<div id="container">
+			<div id="msg-div"></div>
+			<div id="user-list-div">
+				<h4 id="user-list-header">Online User (1)</h4>
+				<ul id="user-list-ul"></ul>
+			</div>
+		</div>
+		<form action="">
+			<input id="msg-input" autocomplete="off" />
+			<button id="send">Send</button>
+		</form>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+		<script>
+			$(function () {
+				// open connection
+				var socket = io();
+				
+				// ask user information for login attempt
+				var userInfo = askUserInfo();
+				socket.emit('login attempt', userInfo);
+				
+				// if login failed, ask user information again
+				socket.on('login failed', function(data) {
+					if(data.accountFound) {
+						alert("密碼輸入錯誤，請重新登入！");
+					} else{
+						alert("帳號並未註冊，請重新登入！");
+					}
+					userInfo = askUserInfo();
+					socket.emit('login attempt', userInfo);
+				});
+				
+				// if register failed, ask user information again
+				socket.on('register failed', function(data) {
+					alert("相同帳號已被註冊，請重新登入！");
+					userInfo = askUserInfo();
+					socket.emit('login attempt', userInfo);
+				});
+				
+				// once login succeeded, user can start chatting
+				socket.on('login successfully', function(myUsername) {				
+					userInfo.username = myUsername;
+					
+					// send messages to the server when form submitted
+					$('form').submit(function() {
+						socket.emit('chat message', $('#msg-input').val());
+						$('#msg-input').val('');
+						return false;
+					});
+					
+					var prevSocketInfo = {
+						username: undefined,
+						year: undefined,
+						month: undefined,
+						date: undefined,
+						hour: undefined,
+						minute: undefined
+					};
+					
+					socket.on('chat message', function(data) {
+						if( isTimeClose(data, prevSocketInfo) ) {
+							showTime(data.year, data.month, data.date, data.hour, data.minute);
+                     showUserName(data.username, data.nickname, userInfo.username);
+						} else if( prevSocketInfo.username != data.username ) {
+							showUserName(data.username, data.nickname, userInfo.username);
+						}
+						showMsg(data.msg, data.username, userInfo.username);
+						scrollToBottom("msg-div");
+						prevSocketInfo = {
+							username: data.username,
+							year: data.year,
+							month: data.month,
+							date: data.date,
+							hour: data.hour,
+							minute: data.minute
+						};
+					});
+					
+					socket.on('add user', function(data) {
+						showUserChange(data.nickname + '(' + data.username + ')' + "進入聊天室");
+						updateUserList(data.usernameList, data.nicknameList);
+						scrollToBottom("user-list-div");
+					});
+			  
+					socket.on('user left', function(data) {
+						showUserChange(data.nickname + '(' + data.username + ')' + "離開聊天室");
+						updateUserList(data.usernameList, data.nicknameList);
+						scrollToBottom("user-list-div");
+					});
+					
+					socket.on('update user list', function(data) {
+						updateUserList(data.usernameList, data.nicknameList);
+						scrollToBottom("user-list-div");
+					});
+				});
+			});
+			
+			function askUserInfo() {
+				var userInput = prompt("請輸入帳號(訪客請輸入guest，註冊請輸入new)", "guest");
+				if(userInput=="new") {
+					var userRegisterInfo = askUserRegisterInfo();
+					userRegisterInfo.newUser = true;
+					return userRegisterInfo;
+				} else if(userInput == "guest" || userInput=="" || userInput==null) {    // considered as guest
+					var nickname = askNickname();
+					return { account:"guest", password:undefined, nickname:nickname, newUser:false };
+				} else {    // registered user
+					var password = prompt("請輸入密碼");
+					return { account:userInput, password:password, nickname:undefined, newUser:false };
+				}
+			}
+			
+			function askUserRegisterInfo() {
+				do {
+					do {
+						var account = prompt("請輸入註冊帳號");
+						var password = prompt("請輸入註冊密碼");
+						var passwordDoubleCheck = prompt("請再次輸入註冊密碼");
+						if(password != passwordDoubleCheck) { alert("密碼輸入錯誤，請重新註冊！"); }
+					} while(passwordDoubleCheck != password)
+				}	while( !(confirm("確定註冊帳號: " + account + " ?")) )
+				
+				var nickname = askNickname();
+				return {account:account, password:password, nickname:nickname}
+			}
+			
+			function showTime(year, month, date, hour, minute) {
+				var newDiv = document.createElement("div");
+				newDiv.className += "user-or-time-change";
+				newDiv.innerHTML = year + '/' + month + '/' + date + ' ' + hour + ':' + minute;
+				document.getElementById("msg-div").appendChild(newDiv);
+			}
+			
+			function askNickname() {
+				do {
+					do {
+						var nickname = prompt("請輸入暱稱");
+						if(nickname=="" || nickname==null) { alert("暱稱請勿空白！"); }
+						if(nickname.includes("guest")) { alert("暱稱不可為guest！"); }
+					}
+					while( nickname=="" || nickname==null || nickname.includes("guest") )
+
+				} while( !(confirm("確定使用暱稱: " + nickname + " ?")) )
+				return nickname;
+			}
+			
+			var numDiv = 0;
+			function showUserName(username, nickname, myUsername) {
+				// create div object for the same user talking in close time
+				var newDiv = document.createElement("div");
+				numDiv = numDiv + 1;
+				newDiv.id = "msg-div-" + numDiv;
+				newDiv.className += "msg-div-" + decideMsgClass(username, myUsername);
+				document.getElementById("msg-div").appendChild(newDiv);
+				var userHeader = document.createElement("h4");
+				userHeader.innerHTML = nickname;
+				document.getElementById("msg-div-" + numDiv).appendChild(userHeader);
+				var ul = document.createElement("ul");
+				ul.id = "msg-div-ul-" + numDiv;
+				document.getElementById("msg-div-" + numDiv).appendChild(ul);
+			}
+			
+			function showMsg(content, username, myUsername) {
+				var newLi = document.createElement("li");
+				newLi.className += "msg-li-" + decideMsgClass(username, myUsername);
+				newLi.innerHTML = content;
+				document.getElementById("msg-div-ul-" + numDiv).appendChild(newLi);
+			}
+			
+			function showUserChange(content) {
+				var newDiv = document.createElement("div");
+				newDiv.className += "user-or-time-change";
+				newDiv.innerHTML = content;
+				document.getElementById("msg-div").appendChild(newDiv);
+			}
+				
+			function updateUserList(usernameList, nicknameList) {
+				if(usernameList.length > 1) {
+					document.getElementById("user-list-header").innerHTML = "Online Users (" + usernameList.length + ")";
+				} else {
+					document.getElementById("user-list-header").innerHTML = "Online User (" + usernameList.length + ")";
+				}
+				var userListUl = document.getElementById("user-list-ul");
+				while (userListUl.firstChild) {
+					userListUl.removeChild(userListUl.firstChild);
+				}
+				for (index = 0; index < usernameList.length; ++index) {
+					var newLi = document.createElement("li");
+					newLi.innerHTML = nicknameList[index] + '(' + usernameList[index] + ')';
+					userListUl.appendChild(newLi);
+				};
+			}
+			
+			function scrollToBottom(divId) {
+				var msgDiv = document.getElementById(divId);
+				msgDiv.scrollTop = msgDiv.scrollHeight;
+			}
+			
+			function isTimeClose(data, prevSocketInfo) {
+				var sameYear = (prevSocketInfo.year == data.year) ;
+				var sameMonth = (prevSocketInfo.month == data.month);
+				var sameDate = (prevSocketInfo.date == data.date);
+				var exactSameDate = sameYear * sameMonth * sameDate;
+				var closeTime = ( (prevSocketInfo.hour*60 + prevSocketInfo.minute) + 5 > (data.hour*60 + data.minute) );
+				return ( !(exactSameDate && closeTime) );
+			}
+			
+			function decideMsgClass(username, myUsername) {
+				if(username != myUsername) {
+					return "others";
+				} else {
+					return "mine";
+				}
+			}
+		</script>
 	</body>
 </html>
