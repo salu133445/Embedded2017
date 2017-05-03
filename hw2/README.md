@@ -1,6 +1,7 @@
 ######  Lab 2 of Embedded System Lab 2017 Spring
 # MeowChat 
 by B02901061 鄧郁璇 & B02901080 董皓文
+
 This project is based on *Idiot Chat Room* we made for Lab 1.
 
 ## Required Packages & Modules
@@ -61,8 +62,11 @@ We use socket.io to create mutual communications between the server and the clie
 
 ### Client
 * Initilization
-    * Ask users for login or sign-up information
-    * 
+    * Ask users for login or sign-up information.
+    * Send the login attempts to the server.
+    * Once logged in succesfully, wait for form-submit and button-click events.
+* Send a message
+    *  Whenever the form has been submitted (through pressing the send button or enter on the keyboard), the input message will be sent to the server.  And then the server will broadcast the received message to all other users. 
 * Send a Meow
     * Whenever the button *Meow* is pressed, a socket will be emitted. Then a pre-recorded sound file (*meow.mp3*) will be played in the erver end.
 * Listening
