@@ -1,0 +1,268 @@
+<!doctype html>
+<meta charset="utf-8">
+<html>
+	<head>
+		<title> Idiot Chat Room </title>
+		<link rel="stylesheet" type="text/css" href="style.css">
+	</head>
+	<body>
+		<div class="header" id="header-container">
+			<div class="header" id="chatroom-header">
+		        <h4>Idiot Chat Room Meow Meow&emsp;<span style="font-size: 70%; font-weight: normal;">by DongTsu and ATeng</span></h4>
+			</div>
+			<div class="header" id="climate">
+			    <h5 id="temp">Temperature: 25 &deg;C</h5>
+			    <h5 id="humid">Humidity: 50 %RH</h5>
+    		</div>
+		</div>
+		<div id="body-container">
+			<div id="msg-div"></div> 
+			<div id="user-list-div">
+				<h4 id="user-list-header">Online User (1)</h4>
+				<ul id="user-list-ul"></ul>
+			</div>
+		</div>
+		<div id="camera-div">
+			<img src="/stream" id="camera" alt="meow camera view">
+			<button id="meow-button">Meow</button>
+			<!-- <button id="chat-button" style="padding:4px">Chat</button> -->
+		</div>
+		<form action="">
+			<input id="msg-input" autocomplete="off" />
+			<button id="send-button">Send</button>
+		</form>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+		<script>
+			$(function () {
+				// open connection
+				var socket = io();
+				
+				var mode = "chat";
+				
+				// ask user information for login attempt
+				var userInfo = askUserInfo();
+				socket.emit('login attempt', userInfo);
+				
+				// if login failed, ask user information again
+				socket.on('login failed', function(data) {
+					if(data.accountFound) {
+						alert("密碼輸入錯誤，請重新登入！");
+					} else{
+						alert("帳號並未註冊，請重新登入！");
+					}
+					userInfo = askUserInfo();
+					socket.emit('login attempt', userInfo);
+				});
+				
+				// if register failed, ask user information again
+				socket.on('register failed', function(data) {
+					alert("相同帳號已被註冊，請重新登入！");
+					userInfo = askUserInfo();
+					socket.emit('login attempt', userInfo);
+				});
+				
+				// once login succeeded, user can start chatting
+				socket.on('login successfully', function(myUsername) {				
+					userInfo.username = myUsername;
+					
+					// send messages to the server when form submitted
+					$('form').submit(function() {
+						socket.emit('chat message', $('#msg-input').val());
+						$('#msg-input').val('');
+						return false;
+					});
+					
+					// send meow request to the server when button clicked
+					$( "#meow-button" ).click(function() {
+					    socket.emit('call meow', {});
+					});
+					
+					$( "#chat-button" ).click(function() {
+					    
+					});
+					
+					var prevSocketInfo = {
+						username: undefined,
+						year: undefined,
+						month: undefined,
+						date: undefined,
+						hour: undefined,
+						minute: undefined
+					};
+					
+					socket.on('chat message', function(data) {
+						if( isTimeClose(data, prevSocketInfo)) {
+							showTime(data.year, data.month, data.date, data.hour, data.minute);
+                     showUserName(data.username, data.nickname, userInfo.username);
+						} else if( prevSocketInfo.username != data.username ) {
+							showUserName(data.username, data.nickname, userInfo.username);
+						}
+						showMsg(data.msg, data.username, userInfo.username);
+						scrollToBottom("msg-div");
+						prevSocketInfo = {
+							username: data.username,
+							year: data.year,
+							month: data.month,
+							date: data.date,
+							hour: data.hour,
+							minute: data.minute
+						};
+					});
+					
+					socket.on('add user', function(data) {
+					        showUserChange(data.nickname + '(' + data.username + ')' + "進入聊天室");
+						    updateUserList(data.usernameList, data.nicknameList);
+						    scrollToBottom("user-list-div");
+					});
+			  
+					socket.on('user left', function(data) {
+    						showUserChange(data.nickname + '(' + data.username + ')' + "離開聊天室");
+    						updateUserList(data.usernameList, data.nicknameList);
+    						scrollToBottom("user-list-div");
+					});
+					
+					socket.on('update user list', function(data) {
+    						updateUserList(data.usernameList, data.nicknameList);
+    						scrollToBottom("user-list-div");
+					});
+				});
+				
+				socket.on('climate', function(data) {
+					document.getElementById("temp").innerHTML = "Temperature:" + data.temp.toFixed(1) + "&deg;C" ;
+					document.getElementById("humid").innerHTML = "Humidity:" + data.humid.toFixed(0) + "%RH";
+				});
+				
+				socket.on('audio message', function(data) {
+				    var newAudio = document.createElement("div");
+				    newAudio.controls = 'controls';
+                    newAudio.src = 'audio_msg_1.mp3';
+                    newAudio.type = 'audio/mpeg';
+                    document.getElementById('user-list-ul').appendChild(newAudio);
+				});
+				
+				socket.on('meow calling', function(data) {
+				        alert('Meow calling~~~~')
+				});
+			});
+			
+			function askUserInfo() {
+				var userInput = prompt("請輸入帳號(訪客請輸入guest，註冊請輸入new)", "guest");
+				if(userInput=="new") {
+					var userRegisterInfo = askUserRegisterInfo();
+					userRegisterInfo.newUser = true;
+					return userRegisterInfo;
+				} else if(userInput == "guest" || userInput=="" || userInput==null) {    // considered as guest
+					var nickname = askNickname();
+					return { account:"guest", password:undefined, nickname:nickname, newUser:false };
+				} else {    // registered user
+					var password = prompt("請輸入密碼");
+					return { account:userInput, password:password, nickname:undefined, newUser:false };
+				}
+			}
+			
+			function askUserRegisterInfo() {
+				do {
+					do {
+						var account = prompt("請輸入註冊帳號");
+						var password = prompt("請輸入註冊密碼");
+						var passwordDoubleCheck = prompt("請再次輸入註冊密碼");
+						if(password != passwordDoubleCheck) { alert("密碼輸入錯誤，請重新註冊！"); }
+					} while(passwordDoubleCheck != password)
+				}	while( !(confirm("確定註冊帳號: " + account + " ?")) )
+				
+				var nickname = askNickname();
+				return {account:account, password:password, nickname:nickname}
+			}
+			
+			function showTime(year, month, date, hour, minute) {
+				var newDiv = document.createElement("div");
+				newDiv.className += "user-or-time-change";
+				newDiv.innerHTML = year + '/' + month + '/' + date + ' ' + hour + ':' + minute;
+				document.getElementById("msg-div").appendChild(newDiv);
+			}
+			
+			function askNickname() {
+				do {
+					do {
+						var nickname = prompt("請輸入暱稱");
+						if(nickname=="" || nickname==null) { alert("暱稱請勿空白！"); }
+						if(nickname.includes("guest")) { alert("暱稱不可為guest！"); }
+					}
+					while( nickname=="" || nickname==null || nickname.includes("guest") )
+
+				} while( !(confirm("確定使用暱稱: " + nickname + " ?")) )
+				return nickname;
+			}
+			
+			var numDiv = 0;
+			function showUserName(username, nickname, myUsername) {
+				// create div object for the same user talking in close time
+				var newDiv = document.createElement("div");
+				numDiv = numDiv + 1;
+				newDiv.id = "msg-div-" + numDiv;
+				newDiv.className += "msg-div-" + decideMsgClass(username, myUsername);
+				document.getElementById("msg-div").appendChild(newDiv);
+				var userHeader = document.createElement("h4");
+				userHeader.innerHTML = nickname;
+				document.getElementById("msg-div-" + numDiv).appendChild(userHeader);
+				var ul = document.createElement("ul");
+				ul.id = "msg-div-ul-" + numDiv;
+				document.getElementById("msg-div-" + numDiv).appendChild(ul);
+			}
+			
+			function showMsg(content, username, myUsername) {
+				var newLi = document.createElement("li");
+				newLi.className += "msg-li-" + decideMsgClass(username, myUsername);
+				newLi.innerHTML = content;
+				document.getElementById("msg-div-ul-" + numDiv).appendChild(newLi);
+			}
+			
+			function showUserChange(content) {
+				var newDiv = document.createElement("div");
+				newDiv.className += "user-or-time-change";
+				newDiv.innerHTML = content;
+				document.getElementById("msg-div").appendChild(newDiv);
+			}
+				
+			function updateUserList(usernameList, nicknameList) {
+				if(usernameList.length > 1) {
+					document.getElementById("user-list-header").innerHTML = "Online Users (" + usernameList.length + ")";
+				} else {
+					document.getElementById("user-list-header").innerHTML = "Online User (" + usernameList.length + ")";
+				}
+				var userListUl = document.getElementById("user-list-ul");
+				while (userListUl.firstChild) {
+					userListUl.removeChild(userListUl.firstChild);
+				}
+				for (index = 0; index < usernameList.length; ++index) {
+					var newLi = document.createElement("li");
+					newLi.innerHTML = nicknameList[index] + '(' + usernameList[index] + ')';
+					userListUl.appendChild(newLi);
+				};
+			}
+			
+			function scrollToBottom(divId) {
+				var msgDiv = document.getElementById(divId);
+				msgDiv.scrollTop = msgDiv.scrollHeight;
+			}
+			
+			function isTimeClose(data, prevSocketInfo) {
+				var sameYear = (prevSocketInfo.year == data.year) ;
+				var sameMonth = (prevSocketInfo.month == data.month);
+				var sameDate = (prevSocketInfo.date == data.date);
+				var exactSameDate = sameYear * sameMonth * sameDate;
+				var closeTime = ( (prevSocketInfo.hour*60 + prevSocketInfo.minute) + 5 > (data.hour*60 + data.minute) );
+				return ( !(exactSameDate && closeTime) );
+			}
+			
+			function decideMsgClass(username, myUsername) {
+				if(username != myUsername) {
+					return "others";
+				} else {
+					return "mine";
+				}
+			}
+		</script>
+	</body>
+</html>
