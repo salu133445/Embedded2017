@@ -24,6 +24,7 @@ var arrRegisteredUser = [];
 var numGuest = 1;
 var errClimate = 0;
 var errAmbient = 0;
+var ambientLightThreshold = 0.025;
 
 app.use(express.static(path.join(__dirname, '/public')));
 
@@ -154,10 +155,6 @@ io.on('connection', function(socket) {
     var sound = new av.Player(mp3);
     sound.play();
     console.log("A meow has been sent.");
-  });
-  
-  socket.on('change mode to chat', function(data) {
-      socket.emit('update user list', { usernameList:arrOnlineUsername, nicknameList:arrOnlineNickname } );
   });
   
 });
