@@ -76,14 +76,14 @@ We use socket.io to create mutual communications between the server and the clie
     *  Listen to the incoming sockets and act accordingly.
 	 
 ### Snapshots
-##### User Interface
+#### User Interface
 
 ![User Interface](https://github.com/salu133445/Embedded2017/blob/master/hw2/snapshot/UI.png)
 
-##### User Interface - Ambient Module Triggered
+#### User Interface - Ambient Module Triggered
 
 ![UI-Ambient](https://github.com/salu133445/Embedded2017/blob/master/hw2/snapshot/UI-Ambient.png)
 
-##### User Interface - Temperature & Humidity Information Updating
+#### User Interface - Temperature & Humidity Information Updating
 
 ![UI-Climate](https://github.com/salu133445/Embedded2017/blob/master/hw2/snapshot/UI-Climate.png)
