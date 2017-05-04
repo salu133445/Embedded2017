@@ -88,9 +88,11 @@ We use socket.io to create mutual communications between the server and the clie
 #### User Interface - Ambient Module Triggered
 
 Once the ambient module is triggered, an alert will pop out in the user interface. 
+
 ![UI-Ambient](https://github.com/salu133445/Embedded2017/blob/master/hw2/snapshot/UI-Ambient.png)
 
 #### User Interface - Temperature & Humidity Information Updating
 
 The temperature and humidity information are shown on the right top of the user interface, being updated every second.
+
 ![UI-Climate](https://github.com/salu133445/Embedded2017/blob/master/hw2/snapshot/UI-Climate.png)
