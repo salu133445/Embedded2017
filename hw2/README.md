@@ -26,7 +26,8 @@ This project is based on *Idiot Chat Room* we made for Lab 1.
 ## How to Run
 
 1. Connect to the tessel 2 board
-2. Run the following
+2. Make sure your tessel 2 has been connected to the same wifi AP as the client end does, since the demo is done within LAN.
+3. Run the following
     ```
         t2 run meow.js
     ```
@@ -38,33 +39,35 @@ This project is based on *Idiot Chat Room* we made for Lab 1.
     listening on *: xxxx
     http://oooooo.local:xxxx
     ```
-3. Open the address in a browser (Chrome recommended)
+4. Open the address in a browser (Chrome recommended)
 
 ## Features
 MeowChat is a multifunctional pet monitoring system embedded in a online chat room with the following features.
 * Realtime video monitoring
-* Calling your pets (press *Meow* and your cat will hear your voice)
+* Calling your pets (press *Meow* and your cat will hear your prerecorded voice)
 * Temperature and humidity monitoring (update every sec)
-* Chatting room (with online user list)
+* Chat room (with online user list)
 * Login and registration system
 
 ## System Architecture
-We use socket.io to create mutual communications between the server and the clients.  
-### Server
+
+We use socket.io to create mutual communications between the server and the clients.
+
+### Server End
 * Initilization
-    * modules connected
-    * connection established
+    * Connect with tessel modules.
+    * Establish a socket connection through socket.io.
 * Monitoring
-    * We use only the light level data of the ambient module (sampled every second). Whenever the light level is less than *ambientLightThreshold* (default is 0.025), an socket will be emitted and an alert will pop up in the client end.
-    * We sampled the temperature and humidty information provided by the climate module every second, and a socket containg the data will be emitted. Then the temperature and humidty information (shown on the right top) will be updated accordingly.
+    * Detect the light level data by the ambient module (sampled every second). Whenever the light level is less than * ambientLightThreshold* (default is 0.025), an socket will be emitted and an alert will pop up in the client end.
+    * Detect the temperature and humidty by the climate module (sampled every second). Emit a socket containg the data. Then the temperature and humidty information in the client end (shown on the right top) will be updated accordingly.
 * Listening
     *  Listen to the incoming sockets and act accordingly.
 
-### Client
+### Client End
 * Initilization
     * Ask users for login or sign-up information.
     * Send the login attempts to the server.
-    * Once logged in succesfully, wait for form-submit and button-click events.
+    * Wait for form-submit and button-click events once the user has logged in succesfully.
 * Send a message
     *  Whenever the form has been submitted (through pressing the send button or enter on the keyboard), the input message will be sent to the server.  And then the server will broadcast the received message to all other users. 
 * Send a Meow
