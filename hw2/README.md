@@ -78,12 +78,12 @@ We use socket.io to create mutual communications between the server and the clie
 ### Snapshots
 ##### User Interface
 
-![User Interface](https://github.com/salu133445/Embedded2017/hw2/snapshot/UI.jpg)
+![User Interface](https://github.com/salu133445/Embedded2017/blob/master/hw2/snapshot/UI.png)
 
 ##### User Interface - Ambient Module Triggered
 
-![UI-Ambient](https://github.com/salu133445/Embedded2017/hw2/snapshot/UI-Ambient.jpg)
+![UI-Ambient](https://github.com/salu133445/Embedded2017/blob/master/hw2/snapshot/UI-Ambient.png)
 
 ##### User Interface - Temperature & Humidity Information Updating
 
-![UI-Climate](https://github.com/salu133445/Embedded2017/hw2/snapshot/UI-Climate.jpg)
+![UI-Climate](https://github.com/salu133445/Embedded2017/blob/master/hw2/snapshot/UI-Climate.png)
