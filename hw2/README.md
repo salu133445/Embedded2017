@@ -39,13 +39,13 @@ This project is based on *Idiot Chat Room* we made for Lab 1.
     listening on *: xxxx
     http://oooooo.local:xxxx
     ```
-4. Open the address in a browser (Chrome recommended)
+4. Enter the address in a browser (Chrome recommended)
 
 ## Features
-MeowChat is a multifunctional pet monitoring system embedded in a online chat room with the following features.
+MeowChat is a multifunctional pet monitoring system embedded in an online chat room with the following features.
 * Realtime video monitoring
 * Calling your pets (press *Meow* and your cat will hear your prerecorded voice)
-* Receive calls from your pets as their paws being detected. 
+* Receiving calls from your pets once their paws are detected. 
 * Temperature and humidity monitoring (update every sec)
 * Chat room (with online user list)
 * Login and registration system
