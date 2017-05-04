@@ -59,8 +59,8 @@ We use socket.io to create mutual communications between the server and the clie
     * Connect with tessel modules.
     * Establish a socket connection through socket.io.
 * Monitoring
-    * Detect the light level data by the ambient module (sampled every second). Whenever the light level is less than * ambientLightThreshold* (default is 0.025), a socket will be emitted and an alert will pop out in the client end.
-    * Detect the temperature and humidty by the climate module (sampled every second). Emit a socket containg the data. Then the temperature and humidity information in the client end (shown on the right top) will be updated accordingly.
+    * Detect the light level data by the ambient module (sampled every second). Whenever the light level is less than * ambientLightThreshold* (0.025 by default), a socket will be emitted and an alert will pop out in the client end.
+    * Detect the temperature and humidity by the climate module (sampled every second). Emit a socket containg the data. Then the temperature and humidity information in the client end (shown on the right top) will be updated accordingly.
 * Listening
     *  Listen to the incoming sockets and act accordingly.
 
