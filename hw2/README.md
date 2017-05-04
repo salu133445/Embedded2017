@@ -72,7 +72,7 @@ We use socket.io to create mutual communications between the server and the clie
 * Send a message
     *  Whenever the form has been submitted (through pressing the send button or enter on the keyboard), the input message will be sent to the server.  And then the server will broadcast the received message to all other users. 
 * Send a Meow
-    * Whenever the button *Meow* is pressed, a socket will be emitted. Then a pre-recorded sound file (*meow.mp3*) will be played in the server end.
+    * Whenever the button *Meow* (shown on the right top of the video image) is pressed, a socket will be emitted. Then a pre-recorded sound file (*meow.mp3*) will be played in the server end.
 * Listening
     *  Listen to the incoming sockets and act accordingly.
 	 
