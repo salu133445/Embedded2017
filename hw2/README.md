@@ -54,23 +54,36 @@ MeowChat is a multifunctional pet monitoring system embedded in a online chat ro
 We use socket.io to create mutual communications between the server and the clients.
 
 ### Server End
-* Initilization
+* Initialization
     * Connect with tessel modules.
     * Establish a socket connection through socket.io.
 * Monitoring
     * Detect the light level data by the ambient module (sampled every second). Whenever the light level is less than * ambientLightThreshold* (default is 0.025), an socket will be emitted and an alert will pop up in the client end.
-    * Detect the temperature and humidty by the climate module (sampled every second). Emit a socket containg the data. Then the temperature and humidty information in the client end (shown on the right top) will be updated accordingly.
+    * Detect the temperature and humidty by the climate module (sampled every second). Emit a socket containg the data. Then the temperature and humidity information in the client end (shown on the right top) will be updated accordingly.
 * Listening
     *  Listen to the incoming sockets and act accordingly.
 
 ### Client End
-* Initilization
+* Initialization
     * Ask users for login or sign-up information.
     * Send the login attempts to the server.
     * Wait for form-submit and button-click events once the user has logged in succesfully.
 * Send a message
     *  Whenever the form has been submitted (through pressing the send button or enter on the keyboard), the input message will be sent to the server.  And then the server will broadcast the received message to all other users. 
 * Send a Meow
-    * Whenever the button *Meow* is pressed, a socket will be emitted. Then a pre-recorded sound file (*meow.mp3*) will be played in the erver end.
+    * Whenever the button *Meow* is pressed, a socket will be emitted. Then a pre-recorded sound file (*meow.mp3*) will be played in the server end.
 * Listening
     *  Listen to the incoming sockets and act accordingly.
+	 
+### Snapshots
+##### User Interface
+
+![User Interface](https://github.com/salu133445/Embedded2017/hw2/snapshot/UI.jpg)
+
+##### User Interface - Ambient Module Triggered
+
+![UI-Ambient](https://github.com/salu133445/Embedded2017/hw2/snapshot/UI-Ambient.jpg)
+
+##### User Interface - Temperature & Humidity Information Updating
+
+![UI-Climate](https://github.com/salu133445/Embedded2017/hw2/snapshot/UI-Climate.jpg)

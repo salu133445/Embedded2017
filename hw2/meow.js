@@ -57,7 +57,6 @@ io.on('connection', function(socket) {
 		climate.readTemperature('c', function (err, temp) {
 			climate.readHumidity(function (err, humid) {
 				socket.emit('climate', { temp:temp, humid:humid } );
-				setTimeout(loop, 1000);
 			});
 		});
 	}, 1000);

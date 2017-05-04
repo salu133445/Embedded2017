@@ -59,6 +59,7 @@ button {
     height: 80vh;
     overflow: auto;
     overflow-x: hidden;
+	 width: calc(100% - 320px);
 }
 #msg-div div {
     padding: 5px 10px;
