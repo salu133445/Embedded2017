@@ -45,6 +45,7 @@ This project is based on *Idiot Chat Room* we made for Lab 1.
 MeowChat is a multifunctional pet monitoring system embedded in a online chat room with the following features.
 * Realtime video monitoring
 * Calling your pets (press *Meow* and your cat will hear your prerecorded voice)
+* Receive calls from your pets as their paws being detected. 
 * Temperature and humidity monitoring (update every sec)
 * Chat room (with online user list)
 * Login and registration system
@@ -58,7 +59,7 @@ We use socket.io to create mutual communications between the server and the clie
     * Connect with tessel modules.
     * Establish a socket connection through socket.io.
 * Monitoring
-    * Detect the light level data by the ambient module (sampled every second). Whenever the light level is less than * ambientLightThreshold* (default is 0.025), an socket will be emitted and an alert will pop up in the client end.
+    * Detect the light level data by the ambient module (sampled every second). Whenever the light level is less than * ambientLightThreshold* (default is 0.025), a socket will be emitted and an alert will pop out in the client end.
     * Detect the temperature and humidty by the climate module (sampled every second). Emit a socket containg the data. Then the temperature and humidity information in the client end (shown on the right top) will be updated accordingly.
 * Listening
     *  Listen to the incoming sockets and act accordingly.
@@ -76,14 +77,20 @@ We use socket.io to create mutual communications between the server and the clie
     *  Listen to the incoming sockets and act accordingly.
 	 
 ### Snapshots
+#### System Overview
+
+![IMAG-system](https://github.com/salu133445/Embedded2017/blob/master/hw2/snapshot/IMAG1887.jpg)
+
 #### User Interface
 
 ![User Interface](https://github.com/salu133445/Embedded2017/blob/master/hw2/snapshot/UI.png)
 
 #### User Interface - Ambient Module Triggered
 
+Once the ambient module is triggered, an alert will pop out in the user interface. 
 ![UI-Ambient](https://github.com/salu133445/Embedded2017/blob/master/hw2/snapshot/UI-Ambient.png)
 
 #### User Interface - Temperature & Humidity Information Updating
 
+The temperature and humidity information are shown on the right top of the user interface, being updated every second.
 ![UI-Climate](https://github.com/salu133445/Embedded2017/blob/master/hw2/snapshot/UI-Climate.png)
