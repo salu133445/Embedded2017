@@ -4,6 +4,14 @@ by B02901061 鄧郁璇 & B02901080 董皓文
 
 This project is based on *Idiot Chat Room* we made for Lab 1.
 
+Input Module:
+* ambient
+* climate
+* USB camera
+
+Output Module:
+* USB audio
+
 ## Required Packages & Modules
 
 ### JavaScript packages
@@ -25,9 +33,10 @@ This project is based on *Idiot Chat Room* we made for Lab 1.
 
 ## How to Run
 
-1. Connect to the tessel 2 board
-2. Make sure your tessel 2 has been connected to the same wifi AP as the client end does, since the demo is done within LAN.
-3. Run the following
+1. Connect your PC to the tessel 2 board
+2. Plug the climate module at port A and the ambient module at port B.
+3. Make sure your tessel 2 has been connected to the same wifi AP as the client end does, since the demo is done within LAN.
+4. Run the following
     ```
         t2 run meow.js
     ```
@@ -39,7 +48,7 @@ This project is based on *Idiot Chat Room* we made for Lab 1.
     listening on *: xxxx
     http://oooooo.local:xxxx
     ```
-4. Enter the address in a browser (Chrome recommended)
+5. Enter the address in a browser (Chrome recommended)
 
 ## Features
 MeowChat is a multifunctional pet monitoring system embedded in an online chat room with the following features.
